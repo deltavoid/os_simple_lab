@@ -49,14 +49,6 @@ void putstring(const char *s)
 extern void __alltraps(void);
 
 
-/*
-void set_time_cmp(uint64_t when)
-{
-    asm volatile ("li t0, -1\n\t"
-                  "sw 
-    );
-}*/
-
 
 void trap(void)
 {
@@ -66,7 +58,7 @@ void trap(void)
 
     if (mtime == mtimecmp)
     {
-        mtimecmp += 5000;
+        mtimecmp += 500000;
         putstring("ticks\n");
     }
 }
@@ -74,11 +66,7 @@ void trap(void)
 
 
 static inline uint64_t get_cycles(void) {
-#if __riscv_xlen == 64
-    uint64_t n;
-    __asm__ __volatile__("rdtime %0" : "=r"(n));
-    return n;
-#else
+
     uint32_t lo, hi, tmp;
     __asm__ __volatile__(
         "1:\n"
@@ -88,7 +76,6 @@ static inline uint64_t get_cycles(void) {
         "bne %0, %2, 1b"
         : "=&r"(hi), "=&r"(lo), "=&r"(tmp));
     return ((uint64_t)hi << 32) | lo;
-#endif
 }
 
 void boot_loader()
@@ -96,16 +83,17 @@ void boot_loader()
     putstring("hello world\n");
 
     mtime = 0;
-    mtimecmp = 5000000;
+    mtimecmp = 500000;
     asm volatile("csrw mie,%0" ::"rK"(0x80));
-    asm volatile("csrw mip,%0" ::"rK"(0x80));
+    //asm volatile("csrw mip,%0" ::"rK"(0x80));
     asm volatile("csrw mtvec,%0" ::"rK"(&__alltraps));
     asm volatile("csrw mstatus,%0" ::"rK"(0x8));
     
     while (1)
     {   uint64_t cycles = get_cycles();
-        char* str = cycles;
-        str[7] = '\n';
+        putstring("cycles\n");
+        //char* str = cycles;
+        //str[7] = '\n';
         //putstring(str);
             
     }
