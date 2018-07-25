@@ -1,11 +1,8 @@
 #include <stdint.h>
 
-//volatile extern uint64_t tohost;
-//volatile extern uint64_t fromhost;
-volatile extern uint64_t tohost;
-volatile extern uint64_t fromhost;
+volatile uint64_t tohost __attribute__((section(".htif")));
+volatile uint64_t fromhost __attribute__((section(".htif")));
 volatile int htif_console_buf;
-uint64_t mtime, mtimecmp;
 
 #define TOHOST_CMD(dev, cmd, payload) \
     (((uint64_t)(dev) << 56) | ((uint64_t)(cmd) << 48) | (uint64_t)(payload))
@@ -13,12 +10,11 @@ uint64_t mtime, mtimecmp;
 #define FROMHOST_CMD(fromhost_value) ((uint64_t)(fromhost_value) << 8 >> 56)
 #define FROMHOST_DATA(fromhost_value) ((uint64_t)(fromhost_value) << 16 >> 16)
 
-
 void htif_console_putchar(uint8_t ch)
 {
     while (tohost)
     {
-        if (!FROMHOST_CMD(fromhost))
+        if (0 == FROMHOST_CMD(fromhost))
         {
             htif_console_buf = 1 + (uint8_t)FROMHOST_DATA(fromhost);
         }
@@ -47,32 +43,8 @@ void putstring(const char *s)
     }
 }
 
-
-extern void __alltraps(void);
-
-
-void trap(void)
+void boot_loader(uintptr_t dtb)
 {
-
-    ++mtime;
-
-    if (mtime == mtimecmp)
-    {
-        mtimecmp += 5000000;
-        putstring("ticks\n");
-    }
-}
-
-
-
-
-
-void boot_loader()
-{
-    mtime = 0;
-    mtimecmp = 5000000;
-    asm volatile("csrw mie,%0" ::"rK"(0x80));
-    asm volatile("csrw mtvec,%0" ::"rK"(&__alltraps));
-    asm volatile("csrw mstatus,%0" ::"rK"(0x8));
+    putstring("Hello World!\n");
     htif_poweroff();
 }
