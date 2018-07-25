@@ -4,17 +4,18 @@
 #define RISCV_PGSIZE (1 << RISCV_PGSHIFT)
 #define REGBYTES 4
 
-  .section .text.init,"ax",@progbits
-  .align 2
-  .globl _start
+    .section .text.init,"ax",@progbits
+    .align 2
+    .globl _start
 _start:
 
-  la sp, stacks + RISCV_PGSIZE
+    la sp, stacks + RISCV_PGSIZE
 
-  j boot_loader
+    j boot_loader
 
 
-  .macro SAVE_ALL
+    .macro SAVE_ALL
+
     csrw mscratch, sp
     addi sp, sp, -34 * REGBYTES
     sw x0, 0*REGBYTES(sp)
@@ -48,19 +49,25 @@ _start:
     sw x29, 29*REGBYTES(sp)
     sw x30, 30*REGBYTES(sp)
     sw x31, 31*REGBYTES(sp)
+
     csrrw s0, mscratch, 0
     csrr s1, mstatus
     csrr s2, mepc
+    
     sw s0, 2*REGBYTES(sp)
     sw s1, 32*REGBYTES(sp)
     sw s2, 33*REGBYTES(sp)
-  .endm
-  .macro RESTORE_ALL
+    .endm
+
+    .macro RESTORE_ALL
+
     # Restore all of the registers.
     lw s1, 32*REGBYTES(sp)
     lw s2, 33*REGBYTES(sp)
+
     csrw mstatus, s1
     csrw mepc, s2
+    
     lw x1, 1*REGBYTES(sp)
     lw x3, 3*REGBYTES(sp)
     lw x4, 4*REGBYTES(sp)
@@ -92,18 +99,19 @@ _start:
     lw x30,30*REGBYTES(sp)
     lw x31,31*REGBYTES(sp)
     lw x2, 2*REGBYTES(sp)
-    
-  .endm
+    .endm
 
-  .globl __alltraps
+    .globl __alltraps
 __alltraps:
-  SAVE_ALL
+    SAVE_ALL
 
-  move a0,sp
-  jal trap
+    move a0,sp
+    jal trap
 
-  RESTORE_ALL
-  mret
+    .globl __trapret
+__trapret:
+    RESTORE_ALL
+    mret
 
   .bss
   .align RISCV_PGSHIFT

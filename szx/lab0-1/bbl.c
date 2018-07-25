@@ -11,7 +11,7 @@ uint64_t mtime, mtimecmp;
 #define FROMHOST_CMD(fromhost_value) ((uint64_t)(fromhost_value) << 8 >> 56)
 #define FROMHOST_DATA(fromhost_value) ((uint64_t)(fromhost_value) << 16 >> 16)
 
-extern void __alltraps(void);
+
 void htif_console_putchar(uint8_t ch)
 {
     while (tohost)
@@ -45,6 +45,10 @@ void putstring(const char *s)
     }
 }
 
+
+extern void __alltraps(void);
+
+
 void trap(void)
 {
 
@@ -57,7 +61,11 @@ void trap(void)
     }
 }
 
-void boot_loader(uintptr_t dtb)
+
+
+
+
+void boot_loader()
 {
     mtime = 0;
     mtimecmp = 5000000;
