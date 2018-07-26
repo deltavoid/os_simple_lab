@@ -12,7 +12,7 @@ _start:
     la sp, stacks + RISCV_PGSIZE
 
 
-    j boot_loader
+    j kern_entry
 
 
     .macro SAVE_ALL
