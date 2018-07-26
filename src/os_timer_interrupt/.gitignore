@@ -1,5 +1,6 @@
 *.o
 *.d
+log.txt
 tmp
 bbl
 bbl.bin

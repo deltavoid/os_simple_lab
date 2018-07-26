@@ -1,9 +1,8 @@
-#include <stdint.h>
+#include "htif.h"
 
 volatile uint64_t tohost __attribute__((section(".htif")));
 volatile uint64_t fromhost __attribute__((section(".htif")));
 volatile int htif_console_buf;
-uint64_t mtime, mtimecmp;
 
 #define TOHOST_CMD(dev, cmd, payload) \
     (((uint64_t)(dev) << 56) | ((uint64_t)(cmd) << 48) | (uint64_t)(payload))
@@ -67,6 +66,27 @@ void put_uint64(uint64_t x)
     }
     htif_console_putchar('\n');
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 extern void __alltraps(void);
