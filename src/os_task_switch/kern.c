@@ -10,7 +10,7 @@ extern void switch_to(struct pushregs *from, struct pushregs *to);
 
 uint64_t* mtime_p = (uint64_t*)0x00200bff8;
 uint64_t* mtimecmp_p = (uint64_t*)0x02004000;
-uint64_t timebase = 0x10000;
+uint64_t timebase = 0x100000;
 uint64_t mtimecmp;
 //uint64_t ticks;
 uint32_t current;
