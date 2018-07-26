@@ -59,7 +59,7 @@ void put_hex(uint8_t c)
 void put_uint64(uint64_t x)
 {
     uint8_t* s = (uint8_t*)&x;
-    for (int i = 7; i > 0; i--)
+    for (int i = 7; i >= 0; i--)
     {
         uint8_t c = s[i];
         put_hex((c >> 4) & 0xf);
