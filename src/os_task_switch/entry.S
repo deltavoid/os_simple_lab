@@ -118,6 +118,81 @@ __trapret:
     RESTORE_ALL
     mret
 
+
+# void switch_to(struct context* from, struct context* to)
+    .globl switch_to
+switch_to:
+    # save from's registers
+    sw x0, 0*REGBYTES(a0)
+    sw x1, 1*REGBYTES(a0)
+    sw x2, 2*REGBYTES(a0)
+    sw x3, 3*REGBYTES(a0)
+    sw x4, 4*REGBYTES(a0)
+    sw x5, 5*REGBYTES(a0)
+    sw x6, 6*REGBYTES(a0)
+    sw x7, 7*REGBYTES(a0)
+    sw x8, 8*REGBYTES(a0)
+    sw x9, 9*REGBYTES(a0)
+    sw x10, 10*REGBYTES(a0)
+    sw x11, 11*REGBYTES(a0)
+    sw x12, 12*REGBYTES(a0)
+    sw x13, 13*REGBYTES(a0)
+    sw x14, 14*REGBYTES(a0)
+    sw x15, 15*REGBYTES(a0)
+    sw x16, 16*REGBYTES(a0)
+    sw x17, 17*REGBYTES(a0)
+    sw x18, 18*REGBYTES(a0)
+    sw x19, 19*REGBYTES(a0)
+    sw x20, 20*REGBYTES(a0)
+    sw x21, 21*REGBYTES(a0)
+    sw x22, 22*REGBYTES(a0)
+    sw x23, 23*REGBYTES(a0)
+    sw x24, 24*REGBYTES(a0)
+    sw x25, 25*REGBYTES(a0)
+    sw x26, 26*REGBYTES(a0)
+    sw x27, 27*REGBYTES(a0)
+    sw x28, 28*REGBYTES(a0)
+    sw x29, 29*REGBYTES(a0)
+    sw x30, 30*REGBYTES(a0)
+    sw x31, 31*REGBYTES(a0)
+
+    # restore to's registers
+    lw x1, 1*REGBYTES(a1)
+    lw x2, 2*REGBYTES(a1)
+    lw x3, 3*REGBYTES(a1)
+    lw x4, 4*REGBYTES(a1)
+    lw x5, 5*REGBYTES(a1)
+    lw x6, 6*REGBYTES(a1)
+    lw x7, 7*REGBYTES(a1)
+    lw x8, 8*REGBYTES(a1)
+    lw x9, 9*REGBYTES(a1)
+    lw x10,10*REGBYTES(a1)
+    lw x11,11*REGBYTES(a1)
+    lw x12,12*REGBYTES(a1)
+    lw x13,13*REGBYTES(a1)
+    lw x14,14*REGBYTES(a1)
+    lw x15,15*REGBYTES(a1)
+    lw x16,16*REGBYTES(a1)
+    lw x17,17*REGBYTES(a1)
+    lw x18,18*REGBYTES(a1)
+    lw x19,19*REGBYTES(a1)
+    lw x20,20*REGBYTES(a1)
+    lw x21,21*REGBYTES(a1)
+    lw x22,22*REGBYTES(a1)
+    lw x23,23*REGBYTES(a1)
+    lw x24,24*REGBYTES(a1)
+    lw x25,25*REGBYTES(a1)
+    lw x26,26*REGBYTES(a1)
+    lw x27,27*REGBYTES(a1)
+    lw x28,28*REGBYTES(a1)
+    lw x29,29*REGBYTES(a1)
+    lw x30,30*REGBYTES(a1)
+    lw x31,31*REGBYTES(a1)
+
+    ret
+
+
+
   .bss
   .align RISCV_PGSHIFT
 stacks:

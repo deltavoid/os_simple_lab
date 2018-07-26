@@ -9,10 +9,10 @@ CFLAGS = -MMD -MP -Wall -D__NO_INLINE__ -mcmodel=medany -O2 -std=gnu99 -Wno-unus
 LDFLAGS = -nostartfiles -nostdlib -static -lgcc -T kern.lds  
 OBJS = kern.o entry.o htif.o
 
-.PHONY : qemu riscvemu objdump clean
+.PHONY : qemu objdump clean
 
 qemu  : kern
-	$(QEMU)  -machine spike_v1.10  -kernel kern -nographic
+	$(QEMU)  -machine spike_v1.10  -kernel kern -nographic > log.txt
 
 kern : $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
