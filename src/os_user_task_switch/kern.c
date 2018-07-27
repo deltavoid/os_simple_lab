@@ -73,8 +73,8 @@ void trap(struct trapframe* tf)
     set_mtimecmp(mtimecmp += timebase);
     
 
-    //if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
-    if  (0)
+    if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
+    //if  (0)
     {
         if  (current == 1)
         {   current = 0;
@@ -118,7 +118,7 @@ void kern_entry()
     context->sp = sp1;
     
 
-    while (1);
+    //while (1);
     current = 1;
     taskA();
 
