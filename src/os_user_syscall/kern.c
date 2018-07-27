@@ -97,18 +97,19 @@ void taskB()
 
 void trap(struct trapframe* tf)
 {
-    putstring("\n");
-    put_uint64(get_mtime());
-    put_uint32(tf->status);
-    put_uint32(tf->cause);
-    put_uint32(current);
-    
-    
+    //put_uint32(tf->status);
+    //put_uint32(tf->cause);
 
     if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
     //if  (0)
     {
-        putstring("clock interrupt\n");
+        putstring("\n");
+        put_uint64(get_mtime());
+        put_uint32(tf->status);
+        put_uint32(tf->cause);
+        put_uint32(current);
+        //putstring("clock interrupt\n");
+        
         set_mtimecmp(mtimecmp += timebase);
         
         if  (current == 1)
