@@ -55,16 +55,16 @@ struct pushregs taskB_context;
 
 uint32_t sys_putc(uint32_t c)
 {
-    /*register uint32_t a0 asm ("a0") = 1;  // syscall index
+    register uint32_t a7 asm ("a7") = SYS_PUTC;  // syscall index
 	register uint32_t a1 asm ("a1") = c;	
 
 	asm volatile ("ecall"
-		          : "+r" (a0)
-		          : "r" (a1)
+		          : "+r" (a1)
+		          : "r" (a7)
 		          : "memory");
-    return a0;*/
+    return a1;
 
-    uint32_t n = SYS_PUTC; // 
+    /*uint32_t n = SYS_PUTC; // 
     uint32_t ret = -1;
 
     asm volatile ("lw a0, %1\n"
@@ -74,21 +74,19 @@ uint32_t sys_putc(uint32_t c)
                   : "=m" (ret)
                   : "m" (n),"m" (c)
                   : "memory");
-    return ret;
+    return ret;*/
 }
 
 void taskA()
 {
     //while (1)  putstring("A");
     while (1)  sys_putc('A');
-    //while (1);
 }
 
 void taskB()
 {
     //while (1)  putstring("B");
     while (1)  sys_putc('B');
-    //while (1);
 }
 
 
@@ -104,12 +102,15 @@ void trap(struct trapframe* tf)
     put_uint32(tf->status);
     put_uint32(tf->cause);
     put_uint32(current);
-    set_mtimecmp(mtimecmp += timebase);
+    
     
 
     if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
     //if  (0)
     {
+        putstring("clock interrupt\n");
+        set_mtimecmp(mtimecmp += timebase);
+        
         if  (current == 1)
         {   current = 0;
             switch_to(&taskA_context, &taskB_context);
@@ -121,11 +122,11 @@ void trap(struct trapframe* tf)
     }
     else if  (tf->cause == CAUSE_USER_ECALL)
     {
-        putstring("syscall\n");
+        /*putstring("syscall\n");
         for (int i = 0; i < 31; i++)
-            put_uint32(((uint32_t*)&tf->gpr)[i]);
+            put_uint32(((uint32_t*)&tf->gpr)[i]);*/
         
-        uint32_t n = tf->gpr.a5;
+        uint32_t n = tf->gpr.a7;
         uint32_t a1 = tf->gpr.a1;
 
         if  (n == SYS_PUTC)
@@ -152,7 +153,6 @@ void kern_entry()
     write_csr(mscratch, 0);
     write_csr(mtvec, &__alltraps);
     write_csr(mie, MIP_MTIP);
-    //write_csr(mie, MIP_USIP);
     //write_csr(mstatus, MSTATUS_MIE);
     
 
@@ -162,7 +162,7 @@ void kern_entry()
     mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_U);
     put_uint32(mstatus);
     //mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 1);
-    mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
+    //mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
     put_uint32(mstatus);
 
     
@@ -172,11 +172,11 @@ void kern_entry()
     struct trapframe* taskB_tf = (struct trapframe*)taskB_sp1;
     memset(taskB_tf, 0, sizeof(struct trapframe));
     taskB_tf->status = mstatus;
-    taskB_tf->epc = &taskB;
+    taskB_tf->epc = (uint32_t)&taskB;
     taskB_tf->gpr.sp = (uint32_t)(taskB_user_stack + USER_STACK_SIZE);
 
     memset(&taskB_context, 0, sizeof(struct pushregs));
-    taskB_context.ra = &__trapret;
+    taskB_context.ra = (uint32_t)&__trapret;
     taskB_context.sp = taskB_sp1;
     
 
@@ -187,7 +187,7 @@ void kern_entry()
     struct trapframe* taskA_tf = (struct trapframe*)taskA_sp1;
     memset(taskA_tf, 0, sizeof(struct trapframe));
     taskA_tf->status = mstatus;
-    taskA_tf->epc = &taskA;
+    taskA_tf->epc = (uint32_t)&taskA;
     taskA_tf->gpr.sp = (uint32_t)(taskA_user_stack + USER_STACK_SIZE);
 
 

@@ -40,6 +40,8 @@ _save_context:
     STORE x1, 1*REGBYTES(sp)
     STORE x3, 3*REGBYTES(sp)
     STORE x4, 4*REGBYTES(sp)
+    #li t0, -1
+    #li a0, -2
     STORE x5, 5*REGBYTES(sp)
     STORE x6, 6*REGBYTES(sp)
     STORE x7, 7*REGBYTES(sp)
