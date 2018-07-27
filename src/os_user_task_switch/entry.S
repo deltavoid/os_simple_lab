@@ -92,7 +92,7 @@ _save_context:
 
     and s0, s1, t0
     #andi s0, s1, SSTATUS_SPP
-    bnez s0, _restore_context
+    bnez s0, _restore_context  #this means it traps mstatusfrom U mode
 
 _save_kernel_sp:
     # Save unwound kernel stack pointer in sscratch

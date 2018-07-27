@@ -53,7 +53,6 @@ struct pushregs taskB_context;
 void taskA()
 {
     while (1)  putstring("A");
-    //while (1) ;
 
 }
 
@@ -110,22 +109,6 @@ void kern_entry()
     
 
 
-    /*
-    uint32_t sp0 = (uint32_t)(taskB_kern_stack + KERN_STACK_SIZE);
-
-    uint32_t sp1 = sp0 - sizeof(struct trapframe);
-    struct trapframe* tf = (struct trapframe*)sp1;
-    memset(tf, 0, sizeof(struct trapframe));
-    //tf->status = MSTATUS_MIE;  //              1000
-    tf->status = 0x00001880;  //  0001 1000 1000 0000
-    tf->epc = &taskB;
-    tf->gpr.sp = sp0;
-
-    struct pushregs* context = (struct pushregs*)&taskB_context;
-    memset(context, 0, sizeof(struct pushregs));
-    context->ra = &__trapret;
-    context->sp = sp1;
-    */
 
     uintptr_t mstatus = 0;
     mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_U);
@@ -160,7 +143,7 @@ void kern_entry()
     taskA_tf->gpr.sp = (uint32_t)(taskA_user_stack + USER_STACK_SIZE);
 
 
-    //uintptr_t sp = taskA_sp1;
+
     current = 1;
     asm volatile("mv sp, %0 \n\t"
                  "j __trapret \n\t"
