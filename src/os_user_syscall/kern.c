@@ -63,27 +63,14 @@ uint32_t sys_putc(uint32_t c)
 		          : "+r" (ret)
 		          : "r"(a1), "r"(a7)
 		          : "memory");
-    //put_uint32(ret);
     return ret;
-
-    /*uint32_t n = SYS_PUTC; // 
-    uint32_t ret = -1;
-
-    asm volatile ("lw a0, %1\n"
-                  "lw a1, %2\n"
-                  "ecall\n"
-                  "sw a0, %0"
-                  : "=m" (ret)
-                  : "m" (n),"m" (c)
-                  : "memory");
-    return ret;*/
 }
 
 void taskA()
 {
     //while (1)  putstring("A");
-    //while (1)  sys_putc('A');
-    while (1)  put_uint32(sys_putc('A'));
+    while (1)  sys_putc('A');
+    //while (1)  put_uint32(sys_putc('A'));
 }
 
 void taskB()
