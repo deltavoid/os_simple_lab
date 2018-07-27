@@ -52,8 +52,8 @@ struct pushregs taskB_context;
 
 void taskA()
 {
-    //while (1)  putstring("A");
-    while (1) ;
+    while (1)  putstring("A");
+    //while (1) ;
 
 }
 
@@ -79,8 +79,8 @@ void trap(struct trapframe* tf)
     set_mtimecmp(mtimecmp += timebase);
     
 
-    //if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
-    if  (0)
+    if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
+    //if  (0)
     {
         if  (current == 1)
         {   current = 0;
@@ -134,7 +134,7 @@ void kern_entry()
     //mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
     put_uint32(mstatus);
 
-    /*
+    
     uint32_t taskB_sp0 = (uint32_t)(taskB_kern_stack + KERN_STACK_SIZE);
 
     uint32_t taskB_sp1 = taskB_sp0 - sizeof(struct trapframe);
@@ -147,7 +147,7 @@ void kern_entry()
     memset(&taskB_context, 0, sizeof(struct pushregs));
     taskB_context.ra = &__trapret;
     taskB_context.sp = taskB_sp1;
-    */
+    
 
 
     uint32_t taskA_sp0 = (uint32_t)(taskA_kern_stack + KERN_STACK_SIZE);
