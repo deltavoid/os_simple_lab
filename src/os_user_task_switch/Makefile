@@ -12,7 +12,7 @@ OBJS = kern.o entry.o htif.o
 .PHONY : qemu objdump clean
 
 qemu  : kern
-	$(QEMU)  -machine spike_v1.10  -kernel kern -nographic #> log.txt
+	$(QEMU)  -machine spike_v1.10  -kernel kern -nographic > log.txt
 
 kern : $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)

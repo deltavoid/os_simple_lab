@@ -13,7 +13,10 @@
     .globl _start
 _start:
 
-    csrw mscratch, x0
+    #csrw mscratch, x0
+    
+    #la t0, __alltraps
+    #csrw mtvec, t0
 
     la sp, stacks + RISCV_PGSIZE
 
