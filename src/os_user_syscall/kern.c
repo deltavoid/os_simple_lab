@@ -57,12 +57,14 @@ uint32_t sys_putc(uint32_t c)
 {
     register uint32_t a7 asm ("a7") = SYS_PUTC;  // syscall index
 	register uint32_t a1 asm ("a1") = c;	
+    register uint32_t ret asm ("a0") = -1;
 
 	asm volatile ("ecall"
-		          : "+r" (a1)
-		          : "r" (a7)
+		          : "+r" (ret)
+		          : "r"(a1), "r"(a7)
 		          : "memory");
-    return a1;
+    //put_uint32(ret);
+    return ret;
 
     /*uint32_t n = SYS_PUTC; // 
     uint32_t ret = -1;
@@ -80,7 +82,8 @@ uint32_t sys_putc(uint32_t c)
 void taskA()
 {
     //while (1)  putstring("A");
-    while (1)  sys_putc('A');
+    //while (1)  sys_putc('A');
+    while (1)  put_uint32(sys_putc('A'));
 }
 
 void taskB()
@@ -127,12 +130,14 @@ void trap(struct trapframe* tf)
         for (int i = 0; i < 31; i++)
             put_uint32(((uint32_t*)&tf->gpr)[i]);*/
         
+        tf->epc += 4;
+        
         uint32_t n = tf->gpr.a7;
         uint32_t a1 = tf->gpr.a1;
 
         if  (n == SYS_PUTC)
         {   htif_console_putchar((uint8_t)a1);
-            tf->gpr.a0 = 0;
+            tf->gpr.a0 = 0x87654321;
         }
         else 
         {   putstring("bad syscall:  ");
