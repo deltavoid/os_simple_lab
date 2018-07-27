@@ -50,16 +50,45 @@ uint32_t taskB_kern_stack[KERN_STACK_SIZE];
 struct pushregs taskA_context;
 struct pushregs taskB_context;
 
+
+#define SYS_PUTC 0x12345678
+
+uint32_t sys_putc(uint32_t c)
+{
+    /*register uint32_t a0 asm ("a0") = 1;  // syscall index
+	register uint32_t a1 asm ("a1") = c;	
+
+	asm volatile ("ecall"
+		          : "+r" (a0)
+		          : "r" (a1)
+		          : "memory");
+    return a0;*/
+
+    uint32_t n = SYS_PUTC; // 
+    uint32_t ret = -1;
+
+    asm volatile ("lw a0, %1\n"
+                  "lw a1, %2\n"
+                  "ecall\n"
+                  "sw a0, %0"
+                  : "=m" (ret)
+                  : "m" (n),"m" (c)
+                  : "memory");
+    return ret;
+}
+
 void taskA()
 {
-    while (1)  putstring("A");
-
+    //while (1)  putstring("A");
+    while (1)  sys_putc('A');
+    //while (1);
 }
 
 void taskB()
 {
-    while (1)  putstring("B");
-
+    //while (1)  putstring("B");
+    while (1)  sys_putc('B');
+    //while (1);
 }
 
 
@@ -90,6 +119,24 @@ void trap(struct trapframe* tf)
             switch_to(&taskB_context, &taskA_context);
         }
     }
+    else if  (tf->cause == CAUSE_USER_ECALL)
+    {
+        putstring("syscall\n");
+        for (int i = 0; i < 31; i++)
+            put_uint32(((uint32_t*)&tf->gpr)[i]);
+        
+        uint32_t n = tf->gpr.a5;
+        uint32_t a1 = tf->gpr.a1;
+
+        if  (n == SYS_PUTC)
+        {   htif_console_putchar((uint8_t)a1);
+            tf->gpr.a0 = 0;
+        }
+        else 
+        {   putstring("bad syscall:  ");
+            put_uint32(n);
+        }
+    }
 
 }
 
@@ -105,6 +152,7 @@ void kern_entry()
     write_csr(mscratch, 0);
     write_csr(mtvec, &__alltraps);
     write_csr(mie, MIP_MTIP);
+    //write_csr(mie, MIP_USIP);
     //write_csr(mstatus, MSTATUS_MIE);
     
 
@@ -113,8 +161,8 @@ void kern_entry()
     uintptr_t mstatus = 0;
     mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_U);
     put_uint32(mstatus);
-    mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 1);
-    //mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
+    //mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 1);
+    mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
     put_uint32(mstatus);
 
     
