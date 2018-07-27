@@ -128,9 +128,11 @@ void kern_entry()
     */
 
     uintptr_t mstatus = 0;
-    mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_S);
+    mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_U);
+    put_uint32(mstatus);
     mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 1);
-    mstatus = INSERT_FIELD(mstatus, MSTATUS_SIE, 1);
+    //mstatus = INSERT_FIELD(mstatus, MSTATUS_UIE, 1);
+    put_uint32(mstatus);
 
     /*
     uint32_t taskB_sp0 = (uint32_t)(taskB_kern_stack + KERN_STACK_SIZE);
@@ -158,32 +160,13 @@ void kern_entry()
     taskA_tf->gpr.sp = (uint32_t)(taskA_user_stack + USER_STACK_SIZE);
 
 
-    uintptr_t sp = taskA_sp1;
-
+    //uintptr_t sp = taskA_sp1;
+    current = 1;
     asm volatile("mv sp, %0 \n\t"
                  "j __trapret \n\t"
                  :
-                 : "r"(sp));
-
-    /*    asm volatile("la t0, 1f\n\t"
-                 "csrrw t0, mtvec, t0\n\t"
-                 "csrw pmpaddr0, %1\n\t"
-                 "csrw pmpcfg0, %0\n\t"
-                 ".align 2\n\t"
-                 "1: csrw mtvec, t0"
-                 :
-                 : "r"(pmpc), "r"(-1UL)
-                 : "t0");*/
-
-
-
-    
-
-    //while (1);
-    /*current = 1;
-    taskA();*/
-
-    
+                 : "r"(taskA_sp1));
+        
 
     htif_poweroff();
 }
