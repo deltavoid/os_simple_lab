@@ -1,0 +1,6 @@
+*.o
+*.d
+kern
+kern.s
+log.txt
+
