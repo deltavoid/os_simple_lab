@@ -125,7 +125,7 @@ void kern_entry()
     memset(taskB_tf, 0, sizeof(struct trapframe));
     taskB_tf->status = mstatus;
     taskB_tf->epc = &taskB;
-    taskB_tf->gpr.sp = (uint32_t)(taskB_user_stack + USER_STACK_SIZE);
+    taskB_tf->gpr.sp = (uint32_t)(taskB_user_stack + USER_STACK_SIZE);  //中断返回后执行taskB时使用的是他的用户态栈
 
     memset(&taskB_context, 0, sizeof(struct pushregs));
     taskB_context.ra = &__trapret;
@@ -140,7 +140,7 @@ void kern_entry()
     memset(taskA_tf, 0, sizeof(struct trapframe));
     taskA_tf->status = mstatus;
     taskA_tf->epc = &taskA;
-    taskA_tf->gpr.sp = (uint32_t)(taskA_user_stack + USER_STACK_SIZE);
+    taskA_tf->gpr.sp = (uint32_t)(taskA_user_stack + USER_STACK_SIZE);  //taskA也需要通过中断返回进入U态执行
 
 
 
@@ -148,7 +148,7 @@ void kern_entry()
     asm volatile("mv sp, %0 \n\t"
                  "j __trapret \n\t"
                  :
-                 : "r"(taskA_sp1));
+                 : "r"(taskA_sp1));  //将栈设置为taskA内核栈的trapframe处，执行__trapret，返回到U态执行
         
 
     htif_poweroff();
