@@ -14,7 +14,7 @@ _start:
     j kern_entry
 
 
-    .macro SAVE_ALL
+    .macro SAVE_ALL  //这里与os_time_interrupt相比增加了两个寄存器mbadaddr(1.10叫mtval)和mcause。mcause存储中断发生的原因，mtval存储于中断相关的值。在本例中mtval并未使用。
 
     csrw mscratch, sp
     addi sp, sp, -36 * REGBYTES
@@ -119,7 +119,7 @@ __trapret:
     mret
 
 
-# void switch_to(struct context* from, struct context* to)
+# void switch_to(struct context* from, struct context* to)  //在任务切换时保存旧任务的上下文并恢复新任务的上下文。
     .globl switch_to
 switch_to:
     # save from's registers
