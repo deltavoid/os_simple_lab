@@ -1,4 +1,7 @@
 // See LICENSE for license details.
+/*这是与RISCV相关的宏定义，所使用的的内容较少，主要有MSTATUS, MIP, set_msr等。
+ *该文件需要进一步的裁剪。
+ */
 
 #ifndef RISCV_CSR_ENCODING_H
 #define RISCV_CSR_ENCODING_H
