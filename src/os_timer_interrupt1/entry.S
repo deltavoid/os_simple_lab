@@ -7,18 +7,17 @@
     .section .text.init,"ax",@progbits
     .align 2
     .globl _start
-_start:  //内核入口
+_start:  //程序初始化入口
 
-    la sp, stacks + RISCV_PGSIZE  //设置栈指针
+    la sp, stacks + RISCV_PGSIZE  //设置栈
+
+    j kern_entry  //跳转到kern.c/kern_entry
 
 
-    j kern_entry  //进入kern.c/kern_entry
+    .macro SAVE_ALL  
 
-
-    .macro SAVE_ALL  //中断处理时保存寄存器的宏
-
-    csrw mscratch, sp  //中断前的栈指针保存到mscratch, 然后保存到栈上。这个写法是为了与以后兼容
-    addi sp, sp, -34 * REGBYTES
+    csrw mscratch, sp
+    addi sp, sp, -36 * REGBYTES
     sw x0, 0*REGBYTES(sp)
     sw x1, 1*REGBYTES(sp)
     sw x3, 3*REGBYTES(sp)
@@ -50,19 +49,24 @@ _start:  //内核入口
     sw x29, 29*REGBYTES(sp)
     sw x30, 30*REGBYTES(sp)
     sw x31, 31*REGBYTES(sp)
-
-    csrrw s0, mscratch, 0
+ 
+    csrr s0, mscratch
+    //这些寄存器会为中断处理程序提供信息，并且mstatus和mepc需要在中断返回之前恢复。本例中并没有过多使用这些信息，以后会逐渐用到。
     csrr s1, mstatus
     csrr s2, mepc
+    csrr s3, mbadaddr  
+    csrr s4, mcause
     
     sw s0, 2*REGBYTES(sp)
     sw s1, 32*REGBYTES(sp)
     sw s2, 33*REGBYTES(sp)
+    sw s3, 34*REGBYTES(sp)
+    sw s4, 35*REGBYTES(sp)
     .endm
 
     .macro RESTORE_ALL
 
-    # Restore all of the registers.  //中断返回时恢复寄存器
+    # Restore all of the registers.
     lw s1, 32*REGBYTES(sp)
     lw s2, 33*REGBYTES(sp)
 
@@ -99,22 +103,24 @@ _start:  //内核入口
     lw x29,29*REGBYTES(sp)
     lw x30,30*REGBYTES(sp)
     lw x31,31*REGBYTES(sp)
+    # restore sp last
     lw x2, 2*REGBYTES(sp)
     .endm
 
     .globl __alltraps
-__alltraps:　　//中断处理入口
+__alltraps:  //中断处理程序入口
     SAVE_ALL
 
-    move a0,sp
-    jal trap  //进入kern.c/trap，这是实际的中断处理函数
+    move a0, sp
+    jal trap
 
     .globl __trapret
 __trapret:  //中断返回
     RESTORE_ALL
     mret
 
+
   .bss
   .align RISCV_PGSHIFT
-stacks:  //栈的位置
+stacks:
   .skip RISCV_PGSIZE

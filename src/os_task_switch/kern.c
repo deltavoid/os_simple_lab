@@ -73,7 +73,7 @@ void trap(struct trapframe* tf)
     set_mtimecmp(mtimecmp += timebase);
     
 
-    if  (tf->cause == (0x80000000 | IRQ_M_TIMER))  // 中断的最高位置1，表明这是一个中断
+    if  (tf->cause == (0x80000000 | IRQ_M_TIMER))  // 中断的最高位置1，表明这是一个中断，否则是一个异常
     {
         if  (current == 1)
         {   current = 0;

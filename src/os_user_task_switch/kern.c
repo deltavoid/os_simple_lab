@@ -79,7 +79,6 @@ void trap(struct trapframe* tf)
     
 
     if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
-    //if  (0)
     {
         if  (current == 1)
         {   current = 0;

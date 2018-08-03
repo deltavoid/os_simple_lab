@@ -53,7 +53,7 @@ struct pushregs taskB_context;
 
 #define SYS_PUTC 0x12345678
 
-uint32_t sys_putc(uint32_t c)  //系统调动，输出一个字符
+uint32_t sys_putc(uint32_t c)  //系统调用，输出一个字符
 {
     register uint32_t a7 asm ("a7") = SYS_PUTC;  // syscall index
 	register uint32_t a1 asm ("a1") = c;	
@@ -91,7 +91,6 @@ void trap(struct trapframe* tf)
     //put_uint32(tf->cause);
 
     if  (tf->cause == (0x80000000 | IRQ_M_TIMER))
-    //if  (0)
     {
         putstring("\n");
         put_uint64(get_mtime());
@@ -113,7 +112,7 @@ void trap(struct trapframe* tf)
     }
     else if  (tf->cause == CAUSE_USER_ECALL)  //根据mcause判断当前异常是U态的系统调用
     {
-        /*putstring("syscall\n");
+        /*putstring("syscall\n");  //调试代码，输出保存在trapframe中的pushregs
         for (int i = 0; i < 31; i++)
             put_uint32(((uint32_t*)&tf->gpr)[i]);*/
         

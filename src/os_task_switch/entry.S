@@ -14,7 +14,7 @@ _start:
     j kern_entry
 
 
-    .macro SAVE_ALL  //这里与os_time_interrupt相比增加了两个寄存器mbadaddr(1.10叫mtval)和mcause。mcause存储中断发生的原因，mtval存储于中断相关的值。在本例中mtval并未使用。
+    .macro SAVE_ALL 
 
     csrw mscratch, sp
     addi sp, sp, -36 * REGBYTES

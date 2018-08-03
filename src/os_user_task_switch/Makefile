@@ -29,6 +29,6 @@ objdump : kern
 
 
 clean:
-	rm -f *.o *.d kern  kern.s
+	rm -f *.o *.d kern  kern.s log.txt
 
 

@@ -49,5 +49,5 @@ void kern_entry()
 
     while (1);
 
-    htif_poweroff();
+    htif_poweroff();  //正常情况下，这条语句不应该被执行
 }
