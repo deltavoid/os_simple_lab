@@ -53,13 +53,13 @@ struct pushregs taskB_context;
 
 #define SYS_PUTC 0x12345678
 
-uint32_t sys_putc(uint32_t c)
+uint32_t sys_putc(uint32_t c)  //系统调动，输出一个字符
 {
     register uint32_t a7 asm ("a7") = SYS_PUTC;  // syscall index
 	register uint32_t a1 asm ("a1") = c;	
     register uint32_t ret asm ("a0") = -1;
 
-	asm volatile ("ecall"
+	asm volatile ("ecall"    //将系统调用的参数放入a7和a1寄存器，然后执行ecall指令，进入M态执行系统调用，执行完后返回值在寄存器a0里
 		          : "+r" (ret)
 		          : "r"(a1), "r"(a7)
 		          : "memory");
@@ -69,8 +69,8 @@ uint32_t sys_putc(uint32_t c)
 void taskA()
 {
     //while (1)  putstring("A");
-    while (1)  sys_putc('A');
-    //while (1)  put_uint32(sys_putc('A'));
+    while (1)  sys_putc('A');//执行系统调用
+    //while (1)  put_uint32(sys_putc('A'));  //执行系统调用并查看返回值
 }
 
 void taskB()
@@ -111,20 +111,20 @@ void trap(struct trapframe* tf)
             switch_to(&taskB_context, &taskA_context);
         }
     }
-    else if  (tf->cause == CAUSE_USER_ECALL)
+    else if  (tf->cause == CAUSE_USER_ECALL)  //根据mcause判断当前异常是U态的系统调用
     {
         /*putstring("syscall\n");
         for (int i = 0; i < 31; i++)
             put_uint32(((uint32_t*)&tf->gpr)[i]);*/
         
-        tf->epc += 4;
+        tf->epc += 4;  //返回后执行的指令地址+4，即执行下一条指令，否则会死循环在当前指令
         
         uint32_t n = tf->gpr.a7;
         uint32_t a1 = tf->gpr.a1;
 
-        if  (n == SYS_PUTC)
+        if  (n == SYS_PUTC)  //判断当前系统调用号
         {   htif_console_putchar((uint8_t)a1);
-            tf->gpr.a0 = 0x87654321;
+            tf->gpr.a0 = 0x87654321;  //设置系统调用的返回值
         }
         else 
         {   putstring("bad syscall:  ");
