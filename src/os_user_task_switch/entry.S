@@ -23,15 +23,15 @@ _start:
     j kern_entry
 
 
-    .macro SAVE_ALL
+    .macro SAVE_ALL  //增加了从用户态中断的处理
 
     # If coming from userspace, preserve the user stack pointer and load
     # the kernel stack pointer. If we came from the kernel, sscratch
     # will contain 0, and we should continue on the current stack.
-    csrrw sp, mscratch, sp
-    bnez sp, _save_context
+    csrrw sp, mscratch, sp 
+    bnez sp, _save_context  // 如果sp为0， 说明中断来自M态，否则来自用户态
 
-_restore_kernel_sp:
+_restore_kernel_sp:  // 如果来自M态，恢复sp为原来M态的值
     csrr sp, mscratch
 _save_context:
     addi sp, sp, -36 * REGBYTES
@@ -88,15 +88,15 @@ _save_context:
 
     LOAD s1, 32*REGBYTES(sp)
     LOAD s2, 33*REGBYTES(sp)
-    li t0, MSTATUS_MPP
+    li t0, MSTATUS_MPP  //根据保存的MSTATUS的MPP判断中断前来自M态还是U态
 
     and s0, s1, t0
     #andi s0, s1, SSTATUS_SPP
-    bnez s0, _restore_context  #this means it traps mstatusfrom U mode
+    bnez s0, _restore_context  #this means it traps mstatus from U mode
 
 _save_kernel_sp:
     # Save unwound kernel stack pointer in sscratch
-    addi s0, sp, 36 * REGBYTES
+    addi s0, sp, 36 * REGBYTES  //如果返回到U态，则先恢复mscratch为内核栈的栈顶
     csrw mscratch, s0
 _restore_context:
     csrw mstatus, s1

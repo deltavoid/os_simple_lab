@@ -7,17 +7,17 @@
     .section .text.init,"ax",@progbits
     .align 2
     .globl _start
-_start:
+_start:  //内核入口
 
-    la sp, stacks + RISCV_PGSIZE
-
-
-    j kern_entry
+    la sp, stacks + RISCV_PGSIZE  //设置栈指针
 
 
-    .macro SAVE_ALL
+    j kern_entry  //进入kern.c/kern_entry
 
-    csrw mscratch, sp
+
+    .macro SAVE_ALL  //中断处理时保存寄存器的宏
+
+    csrw mscratch, sp  //中断前的栈指针保存到mscratch, 然后保存到栈上。这个写法是为了与以后兼容
     addi sp, sp, -34 * REGBYTES
     sw x0, 0*REGBYTES(sp)
     sw x1, 1*REGBYTES(sp)
@@ -62,7 +62,7 @@ _start:
 
     .macro RESTORE_ALL
 
-    # Restore all of the registers.
+    # Restore all of the registers.  //中断返回时恢复寄存器
     lw s1, 32*REGBYTES(sp)
     lw s2, 33*REGBYTES(sp)
 
@@ -103,18 +103,18 @@ _start:
     .endm
 
     .globl __alltraps
-__alltraps:
+__alltraps:　　//中断处理入口
     SAVE_ALL
 
     move a0,sp
-    jal trap
+    jal trap  //进入kern.c/trap，这是实际的中断处理函数
 
     .globl __trapret
-__trapret:
+__trapret:  //中断返回
     RESTORE_ALL
     mret
 
   .bss
   .align RISCV_PGSHIFT
-stacks:
+stacks:  //栈的位置
   .skip RISCV_PGSIZE
