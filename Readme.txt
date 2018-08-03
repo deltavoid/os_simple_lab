@@ -12,5 +12,5 @@ OS Simple Lab
 
 所有实验只需进入相应文件夹下直接make即可，有的实验输出结果在log.txt中。
 
-实验需要配置riscv32位环境，具体参见https://github.com/chyyuu/ucore_os_lab/tree/riscv32-priv-1.10。
+实验需要配置riscv32位环境，具体参见https://github.com/chyyuu/ucore_os_lab/tree/riscv32-priv-1.10 。
 
